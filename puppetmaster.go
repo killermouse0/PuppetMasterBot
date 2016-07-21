@@ -1,16 +1,27 @@
 package main
 
 import (
-	"net/http"
-	"io"
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
+	"net/http"
 )
 
-func HelloServer(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Hello world!\n")
-}
-
 func main() {
-	http.HandleFunc("/", HelloServer)
-	log.Fatal(http.ListenAndServe("127.0.0.1:9080", nil))
+	const token = "252613835:AAFvcaqHZKwefdaeq-w0Cm1fOUCqYFOvefo"
+
+	bot, err := tgbotapi.NewBotAPI(token)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook("https://brainless.me/dkshasdrfiweyrausydfjg"))
+	if err != nil {
+		log.Panic(err)
+	}
+
+	updates := bot.ListenForWebhook("/")
+	go http.ListenAndServe("127.0.0.1:9080", nil)
+	for update := range updates {
+		log.Printf("%+v\n", update)
+	}
 }

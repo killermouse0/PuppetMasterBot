@@ -22,6 +22,7 @@ func main() {
 	updates := bot.ListenForWebhook("/")
 	go http.ListenAndServe("127.0.0.1:9080", nil)
 	for update := range updates {
-		log.Printf("%+v\n", update)
+		var message = tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		bot.Send(message)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 	"net/http"
+	"fmt"
 )
 
 func main() {
@@ -22,7 +23,8 @@ func main() {
 	updates := bot.ListenForWebhook("/")
 	go http.ListenAndServe("127.0.0.1:9080", nil)
 	for update := range updates {
-		var message = tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		text := fmt.Sprintf("Hello %s\nI'm The Puppet Master. But you can call me Master.", update.Message.From.FirstName)
+		var message = tgbotapi.NewMessage(update.Message.Chat.ID, text)
 		bot.Send(message)
 	}
 }

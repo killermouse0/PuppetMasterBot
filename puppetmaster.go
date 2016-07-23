@@ -16,7 +16,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(botURL))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(botUrl))
 	if err != nil {
 		log.Panic(err)
 	}

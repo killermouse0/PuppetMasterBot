@@ -8,14 +8,15 @@ import (
 )
 
 func main() {
-	const token = "252613835:AAFvcaqHZKwefdaeq-w0Cm1fOUCqYFOvefo"
+	const token = "TOKEN"
+	const botUrl = "BOTURL"
 
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook("https://brainless.me/dkshasdrfiweyrausydfjg"))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(botURL))
 	if err != nil {
 		log.Panic(err)
 	}

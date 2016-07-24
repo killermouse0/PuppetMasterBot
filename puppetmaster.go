@@ -41,7 +41,7 @@ func main() {
 		}
 		log.Println(update.Message.Text)
 
-		text := fmt.Sprintf("%#v", q)
+		text := fmt.Sprintf("%v", q)
 
 		var message = tgbotapi.NewMessage(update.Message.Chat.ID, text)
 		bot.Send(message)

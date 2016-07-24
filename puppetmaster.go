@@ -1,12 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 	"net/http"
 	"fmt"
-	_ "github.com/mattn/go-yql"
+	"github.com/sckor/quote"
+	_ "github.com/sckor/yahoo"
 )
 
 func main() {
@@ -24,23 +24,27 @@ func main() {
 	}
 
 	updates := bot.ListenForWebhook("/")
-	db, _ := sql.Open("yql", "")
 	go http.ListenAndServe("127.0.0.1:9080", nil)
+
+
+	qs, err := quote.Open("yahoo", "")
+	if err != nil {
+		log.Fatalln("Can't open Yahoo API: %v", err)
+	}
+
 	for update := range updates {
-		stmt, _ := db.Query(
-			"select * from yahoo.finance.quotes where symbol = ?",
-			"TSLA")
-		for stmt.Next() {
-			var data interface{}
-			stmt.Scan(&data)
-			// text := fmt.Sprintf("Hello %s\nI'm The Puppet Master. But you can call me Master.", update.Message.From.FirstName)
-			text := fmt.Sprintf("%v", data)
-			var message = tgbotapi.NewMessage(update.Message.Chat.ID, text)
-			bot.Send(message)
+		// text := fmt.Sprintf("Hello %s\nI'm The Puppet Master. But you can call me Master.", update.Message.From.FirstName)
+
+		q, err := quote.Retrieve(qs, []string{update.Message.Text})
+		if err != nil {
+			log.Fatalln("Couldn't get the prices: %+v", err)
 		}
+		log.Println(update.Message.Text)
+
+		text := fmt.Sprintf("%#v", q)
+
+		var message = tgbotapi.NewMessage(update.Message.Chat.ID, text)
+		bot.Send(message)
 	}
 }
 
-func getQuotes() {
-
-}

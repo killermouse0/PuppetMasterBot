@@ -33,13 +33,13 @@ func main() {
 	/* Yahoo Finance API connection */
 	qs, err := quote.Open("yahoo", "")
 	if err != nil {
-		log.Fatalln("Can't open Yahoo API: %v", err)
+		log.Fatalln("Can't open Yahoo API:", err)
 	}
 
 	/* Elasticsearch connection */
 	client, err := elastic.NewClient()
 	if err != nil {
-		log.Fatalln("Couldn't connect to Elasticsearch : %v", err)
+		log.Fatalln("Couldn't connect to Elasticsearch :", err)
 	}
 
 	/* Update processing loop */

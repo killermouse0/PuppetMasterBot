@@ -13,7 +13,7 @@ import (
 )
 
 type Portfolio struct {
-	Stocks	string
+	Items	string `json:items`
 }
 
 func main() {
@@ -65,7 +65,7 @@ func main() {
 			json.Unmarshal(*res.Source, &ptf)
 		}
 
-		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Stocks))
+		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Items))
 		q, err := quote.Retrieve(qs, []string{update.Message.Text})
 		if err != nil {
 			log.Fatalln("Couldn't get the prices:", err)

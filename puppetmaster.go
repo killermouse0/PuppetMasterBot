@@ -11,6 +11,10 @@ import (
 	"strconv"
 )
 
+type Portfolio struct {
+	Stocks	string
+}
+
 func main() {
 	const token = "TOKEN"
 	const botUrl = "BOTURL"
@@ -55,7 +59,7 @@ func main() {
 			log.Println("Couldn't find user portfolio for user=",
 				userId, ":", err)
 		}
-		log.Println(fmt.Sprintf("got ptf = %v", ptf))
+		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Source))
 		q, err := quote.Retrieve(qs, []string{update.Message.Text})
 		if err != nil {
 			log.Fatalln("Couldn't get the prices:", err)

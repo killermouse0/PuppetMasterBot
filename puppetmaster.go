@@ -13,7 +13,7 @@ import (
 )
 
 type Portfolio struct {
-	Items	string `json:items`
+	Items	string `json:"items"`
 }
 
 func main() {

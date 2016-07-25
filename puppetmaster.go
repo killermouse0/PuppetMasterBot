@@ -45,16 +45,20 @@ func main() {
 	/* Update processing loop */
 	for update := range updates {
 		userId := update.Message.From.ID
-		log.Println("Got message from user.ID = %v", userId)
-		_, err := client.Get().Id(strconv.Itoa(userId)).Do()
+		log.Println("Got message from user.ID =", userId)
+		ptf, err := client.Get().
+			Index("quotes").
+			Type("portfolio").
+			Id(strconv.Itoa(userId)).
+			Do()
 		if err != nil {
-			log.Println("Couldn't find user portfolio for %v : %v",
-				userId,
-				err)
+			log.Println("Couldn't find user portfolio for user=",
+				userId, ":", err)
 		}
+		log.Println(fmt.Sprintf("got ptf = %v", ptf))
 		q, err := quote.Retrieve(qs, []string{update.Message.Text})
 		if err != nil {
-			log.Fatalln("Couldn't get the prices: %+v", err)
+			log.Fatalln("Couldn't get the prices:", err)
 		}
 		log.Println(update.Message.Text)
 

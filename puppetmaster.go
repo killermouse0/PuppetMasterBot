@@ -9,6 +9,7 @@ import (
 	_ "github.com/sckor/yahoo"
 	"gopkg.in/olivere/elastic.v3"
 	"strconv"
+	"encoding/json"
 )
 
 type Portfolio struct {
@@ -50,7 +51,7 @@ func main() {
 	for update := range updates {
 		userId := update.Message.From.ID
 		log.Println("Got message from user.ID =", userId)
-		ptf, err := client.Get().
+		res, err := client.Get().
 			Index("quotes").
 			Type("portfolio").
 			Id(strconv.Itoa(userId)).
@@ -59,7 +60,12 @@ func main() {
 			log.Println("Couldn't find user portfolio for user=",
 				userId, ":", err)
 		}
-		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Source))
+		var ptf Portfolio;
+		if res != nil {
+			json.Unmarshal(*res.Source, &ptf)
+		}
+
+		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Stocks))
 		q, err := quote.Retrieve(qs, []string{update.Message.Text})
 		if err != nil {
 			log.Fatalln("Couldn't get the prices:", err)

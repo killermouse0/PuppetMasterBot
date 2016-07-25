@@ -7,12 +7,15 @@ import (
 	"fmt"
 	"github.com/sckor/quote"
 	_ "github.com/sckor/yahoo"
+	"github.com/olivere/elastic"
+	"strconv"
 )
 
 func main() {
 	const token = "TOKEN"
 	const botUrl = "BOTURL"
 
+	/* Bot setup */
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Panic(err)
@@ -27,14 +30,28 @@ func main() {
 	go http.ListenAndServe("127.0.0.1:9080", nil)
 
 
+	/* Yahoo Finance API connection */
 	qs, err := quote.Open("yahoo", "")
 	if err != nil {
 		log.Fatalln("Can't open Yahoo API: %v", err)
 	}
 
-	for update := range updates {
-		// text := fmt.Sprintf("Hello %s\nI'm The Puppet Master. But you can call me Master.", update.Message.From.FirstName)
+	/* Elasticsearch connection */
+	client, err := elastic.NewClient()
+	if err != nil {
+		log.Fatalln("Couldn't connect to Elasticsearch : %v", err)
+	}
 
+	/* Update processing loop */
+	for update := range updates {
+		userId := update.Message.From.ID
+		log.Println("Got message from user.ID = %v", userId)
+		_, err := client.Get().Id(strconv.Itoa(userId)).Do()
+		if err != nil {
+			log.Println("Couldn't find user portfolio for %v : %v",
+				userId,
+				err)
+		}
 		q, err := quote.Retrieve(qs, []string{update.Message.Text})
 		if err != nil {
 			log.Fatalln("Couldn't get the prices: %+v", err)

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/sckor/quote"
 	_ "github.com/sckor/yahoo"
-	"github.com/olivere/elastic"
+	"gopkg.in/olivere/elastic.v3"
 	"strconv"
 )
 

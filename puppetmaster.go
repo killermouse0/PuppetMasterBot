@@ -23,7 +23,7 @@ func main() {
 	/* Bot setup */
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal("Can't connect to Telegram Bot API", err)
 	}
 
 	_, err = bot.SetWebhook(tgbotapi.NewWebhook(botUrl))
@@ -33,7 +33,6 @@ func main() {
 
 	updates := bot.ListenForWebhook("/")
 	go http.ListenAndServe("127.0.0.1:9080", nil)
-
 
 	/* Yahoo Finance API connection */
 	qs, err := quote.Open("yahoo", "")
@@ -53,7 +52,7 @@ func main() {
 		userId := update.Message.From.ID
 
 		for _, entity := range *update.Message.Entities {
-			log.Println(fmt.Scanf("%#v", update.Message.Entities))
+			log.Println(fmt.Scanf("%#v", entity))
 			if entity.Type == "bot_command" {
 				command = update.Message.Text[entity.Offset:entity.Offset + entity.Length]
 				log.Println("Got command", command)

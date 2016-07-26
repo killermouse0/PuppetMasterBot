@@ -49,7 +49,15 @@ func main() {
 
 	/* Update processing loop */
 	for update := range updates {
+		var command string
 		userId := update.Message.From.ID
+
+		for _, entity := range *update.Message.Entities {
+			if entity.Type == "bot_command" {
+				command = update.Message.Text[entity.Offset:entity.Offset + entity.Length]
+				log.Println("Got command", command)
+			}
+		}
 		log.Println("Got message from user.ID =", userId)
 		res, err := client.Get().
 			Index("quotes").

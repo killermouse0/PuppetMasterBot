@@ -16,6 +16,21 @@ type Portfolio struct {
 	Items	[]string `json:"items"`
 }
 
+func (p *Portfolio) addItems(items []string) {
+	hItems := make(map[string] int)
+
+	for _, item := range p.Items {
+		hItems[item] = 1
+	}
+	for _, item := range items {
+		hItems[item] = 1
+	}
+	p.Items = *new([]string)
+	for k, _ := range(hItems) {
+		p.Items = append(p.Items, k)
+	}
+}
+
 func main() {
 	const token = "TOKEN"
 	const botUrl = "BOTURL"
@@ -48,16 +63,8 @@ func main() {
 
 	/* Update processing loop */
 	for update := range updates {
-		var command string
 		userId := update.Message.From.ID
 
-		for _, entity := range *update.Message.Entities {
-			log.Println(fmt.Sprintf("Entity is %#v", entity))
-			if entity.Type == "bot_command" {
-				command = update.Message.Text[entity.Offset:entity.Offset + entity.Length]
-				log.Println("Got command", command)
-			}
-		}
 		log.Println("Got message from user.ID =", userId)
 		res, err := client.Get().
 			Index("quotes").
@@ -74,6 +81,16 @@ func main() {
 		}
 
 		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Items))
+
+		if command := getCommand(update); command != "" {
+			switch command {
+			case "/add":
+				ptf.addItems([]string{"Test", "test1"})
+			case "/del":
+			}
+		}
+		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Items))
+
 		q, err := quote.Retrieve(qs, []string{update.Message.Text})
 		if err != nil {
 			log.Fatalln("Couldn't get the prices:", err)
@@ -87,3 +104,14 @@ func main() {
 	}
 }
 
+func getCommand(update tgbotapi.Update) (command string) {
+	command = ""
+	for _, entity := range *update.Message.Entities {
+		log.Println(fmt.Sprintf("Entity is %#v", entity))
+		if entity.Type == "bot_command" {
+			command = update.Message.Text[entity.Offset:entity.Offset + entity.Length]
+			log.Println("Got command", command)
+		}
+	}
+	return command
+}

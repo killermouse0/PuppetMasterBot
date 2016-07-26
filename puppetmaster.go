@@ -52,7 +52,7 @@ func main() {
 		userId := update.Message.From.ID
 
 		for _, entity := range *update.Message.Entities {
-			log.Println(fmt.Scanf("%#v", entity))
+			log.Println(fmt.Sprintf("Entity is %#v", entity))
 			if entity.Type == "bot_command" {
 				command = update.Message.Text[entity.Offset:entity.Offset + entity.Length]
 				log.Println("Got command", command)

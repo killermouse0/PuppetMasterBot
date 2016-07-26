@@ -88,6 +88,7 @@ func main() {
 				log.Println("Message is :", update.Message.Text)
 				ptf.addItems(strings.Fields(update.Message.Text)[1:])
 				client.Index().Id(strconv.Itoa(userId)).Index("quotes").Type("portfolio").BodyJson(ptf).Do()
+				text = "Added stock(s) to portfolio"
 			case "/del":
 				text = "Not yet implemented !"
 			case "/watchlist":
@@ -98,7 +99,6 @@ func main() {
 				text = fmt.Sprintf("%v", q)
 			}
 		}
-
 		message := tgbotapi.NewMessage(update.Message.Chat.ID, text)
 		bot.Send(message)
 	}

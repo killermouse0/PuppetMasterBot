@@ -81,8 +81,7 @@ func main() {
 			json.Unmarshal(*res.Source, &ptf)
 		}
 
-		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Items))
-
+		text := "Whatever, bro"
 		if command := getCommand(update); command != "" {
 			switch command {
 			case "/add":
@@ -90,29 +89,30 @@ func main() {
 				ptf.addItems(strings.Fields(update.Message.Text)[1:])
 				client.Index().Id(strconv.Itoa(userId)).Index("quotes").Type("portfolio").BodyJson(ptf).Do()
 			case "/del":
+				text = "Not yet implemented !"
+			case "/watchlist":
+				q, err := quote.Retrieve(qs, ptf.Items)
+				if err != nil {
+					log.Fatalln("Couldn't get the prices:", err)
+				}
+				text = fmt.Sprintf("%v", q)
 			}
 		}
-		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Items))
 
-		q, err := quote.Retrieve(qs, ptf.Items)
-		if err != nil {
-			log.Fatalln("Couldn't get the prices:", err)
-		}
-
-		text := fmt.Sprintf("%v", q)
-
-		var message = tgbotapi.NewMessage(update.Message.Chat.ID, text)
+		message := tgbotapi.NewMessage(update.Message.Chat.ID, text)
 		bot.Send(message)
 	}
 }
 
 func getCommand(update tgbotapi.Update) (command string) {
 	command = ""
-	for _, entity := range *update.Message.Entities {
-		log.Println(fmt.Sprintf("Entity is %#v", entity))
-		if entity.Type == "bot_command" {
-			command = update.Message.Text[entity.Offset:entity.Offset + entity.Length]
-			log.Println("Got command", command)
+	if update.Message.Entities != nil {
+		for _, entity := range *update.Message.Entities {
+			log.Println(fmt.Sprintf("Entity is %#v", entity))
+			if entity.Type == "bot_command" {
+				command = update.Message.Text[entity.Offset:entity.Offset + entity.Length]
+				log.Println("Got command", command)
+			}
 		}
 	}
 	return command

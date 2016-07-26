@@ -88,16 +88,16 @@ func main() {
 			case "/add":
 				log.Println("Message is :", update.Message.Text)
 				ptf.addItems(strings.Fields(update.Message.Text)[1:])
+				client.Index().Id(strconv.Itoa(userId)).Index("quotes").Type("portfolio").BodyJson(ptf).Do()
 			case "/del":
 			}
 		}
 		log.Println(fmt.Sprintf("got ptf = %#v", ptf.Items))
 
-		q, err := quote.Retrieve(qs, []string{update.Message.Text})
+		q, err := quote.Retrieve(qs, ptf.Items)
 		if err != nil {
 			log.Fatalln("Couldn't get the prices:", err)
 		}
-		log.Println(update.Message.Text)
 
 		text := fmt.Sprintf("%v", q)
 

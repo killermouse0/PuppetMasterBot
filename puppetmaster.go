@@ -86,6 +86,7 @@ func main() {
 		if command := getCommand(update); command != "" {
 			switch command {
 			case "/add":
+				log.Println("Message is :", update.Message.Text)
 				ptf.addItems(strings.Fields(update.Message.Text[strings.Index(" ", update.Message.Text):]))
 			case "/del":
 			}

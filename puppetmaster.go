@@ -10,6 +10,7 @@ import (
 	"gopkg.in/olivere/elastic.v3"
 	"strconv"
 	"encoding/json"
+	"strings"
 )
 
 type Portfolio struct {
@@ -85,7 +86,7 @@ func main() {
 		if command := getCommand(update); command != "" {
 			switch command {
 			case "/add":
-				ptf.addItems([]string{"Test", "test1"})
+				ptf.addItems(strings.Fields(update.Message.Text[strings.Index(" ", update.Message.Text):]))
 			case "/del":
 			}
 		}

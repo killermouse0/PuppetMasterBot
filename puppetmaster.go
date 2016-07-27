@@ -97,8 +97,8 @@ func main() {
 					log.Fatalln("Couldn't get the prices:", err)
 				}
 				text = ""
-				for k, v := range q {
-					text += fmt.Sprintf("%v:\t\t%v\n", k, v)
+				for _, sq := range q {
+					text += fmt.Sprintf("%v:\t\t%v\n", sq.Symbol, sq.LastTradePrice)
 				}
 			case "/search":
 				text = "Not yet implemented!"

@@ -96,7 +96,14 @@ func main() {
 				if err != nil {
 					log.Fatalln("Couldn't get the prices:", err)
 				}
-				text = fmt.Sprintf("%v", q)
+				text = ""
+				for k, v := range q {
+					text += fmt.Sprintf("%v:\t\t%v\n", k, v)
+				}
+			case "/search":
+				text = "Not yet implemented!"
+			default:
+				text = "Sup bro? Sorry but there's no such command!"
 			}
 		}
 		message := tgbotapi.NewMessage(update.Message.Chat.ID, text)

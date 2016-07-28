@@ -100,6 +100,8 @@ func main() {
 				for _, sq := range q {
 					text += fmt.Sprintf("%v:\t\t%v\n", sq.Symbol, sq.LastTradePrice)
 				}
+				text += strings.Join(ptf.Items, " ") 
+				text += "\n"
 			case "/search":
 				text = "Not yet implemented!"
 			default:

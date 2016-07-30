@@ -120,8 +120,16 @@ func main() {
 					idx, err := strconv.Atoi(w)
 					log.Println("Going to delete", idx)
 					if err == nil && idx < len(ptf.Items) {
-						ptf.Items = append(ptf.Items[:idx], ptf.Items[idx+1:]...)
+						ptf.Items[idx] = ""
 					}
+					var tmpItems []string
+					for _, v := range ptf.Items {
+						if (v != "") {
+							tmpItems = append(tmpItems, v)
+						}
+					}
+
+					ptf.Items = tmpItems;
 				}
 				client.Index().Id(strconv.Itoa(userId)).Index("quotes").Type("portfolio").BodyJson(ptf).Do()
 				text = "Portfolio was updated"

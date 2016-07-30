@@ -118,6 +118,7 @@ func main() {
 			case "deleting":
 				for _, w := range words {
 					idx, err := strconv.Atoi(w)
+					log.Println("Going to delete", idx)
 					if err == nil && idx < len(ptf.Items) {
 						ptf.Items = append(ptf.Items[:idx], ptf.Items[idx+1:]...)
 					}

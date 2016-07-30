@@ -123,6 +123,7 @@ func main() {
 				}
 				client.Index().Id(strconv.Itoa(userId)).Index("quotes").Type("portfolio").BodyJson(ptf).Do()
 				text = "Portfolio was updated"
+				delete(userState, userId)
 			}
 		}
 		message := tgbotapi.NewMessage(update.Message.Chat.ID, text)

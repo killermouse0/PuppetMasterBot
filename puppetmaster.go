@@ -36,6 +36,8 @@ func main() {
 	const token = "TOKEN"
 	const botUrl = "BOTURL"
 
+	// userState := make(map[string]string)
+
 	/* Bot setup */
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
@@ -85,12 +87,15 @@ func main() {
 		if command := getCommand(update); command != "" {
 			switch command {
 			case "/add":
-				log.Println("Message is :", update.Message.Text)
 				ptf.addItems(strings.Fields(update.Message.Text)[1:])
 				client.Index().Id(strconv.Itoa(userId)).Index("quotes").Type("portfolio").BodyJson(ptf).Do()
 				text = "Added stock(s) to portfolio"
 			case "/del":
-				text = "Not yet implemented !"
+				text = "Here's what you have in your portfolio :\n"
+				for i, item := range ptf.Items {
+					text += fmt.Sprintf("%v - %v\n", i, item)
+				}
+				text += "\nWhich index do you want to delete ?\n"
 			case "/watchlist":
 				q, err := quote.Retrieve(qs, ptf.Items)
 				if err != nil {
@@ -100,8 +105,6 @@ func main() {
 				for _, sq := range q {
 					text += fmt.Sprintf("%v:\t\t%v\n", sq.Symbol, sq.LastTradePrice)
 				}
-				text += strings.Join(ptf.Items, " ") 
-				text += "\n"
 			case "/search":
 				text = "Not yet implemented!"
 			default:
@@ -117,7 +120,6 @@ func getCommand(update tgbotapi.Update) (command string) {
 	command = ""
 	if update.Message.Entities != nil {
 		for _, entity := range *update.Message.Entities {
-			log.Println(fmt.Sprintf("Entity is %#v", entity))
 			if entity.Type == "bot_command" {
 				command = update.Message.Text[entity.Offset:entity.Offset + entity.Length]
 				log.Println("Got command", command)

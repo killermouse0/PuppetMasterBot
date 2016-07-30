@@ -85,6 +85,7 @@ func main() {
 
 		text := "Whatever, bro"
 		if command := getCommand(update); command != "" {
+			delete(userState, userId)
 			switch command {
 			case "/add":
 				ptf.addItems(strings.Fields(update.Message.Text)[1:])

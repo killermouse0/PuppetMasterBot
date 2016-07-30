@@ -36,7 +36,7 @@ func main() {
 	const token = "TOKEN"
 	const botUrl = "BOTURL"
 
-	// userState := make(map[string]string)
+	userState := make(map[int]string)
 
 	/* Bot setup */
 	bot, err := tgbotapi.NewBotAPI(token)
@@ -96,6 +96,7 @@ func main() {
 					text += fmt.Sprintf("%v - %v\n", i, item)
 				}
 				text += "\nWhich index do you want to delete ?\n"
+				userState[userId] = "deleting"
 			case "/watchlist":
 				q, err := quote.Retrieve(qs, ptf.Items)
 				if err != nil {
@@ -109,6 +110,19 @@ func main() {
 				text = "Not yet implemented!"
 			default:
 				text = "Sup bro? Sorry but there's no such command!"
+			}
+		} else {
+			words := strings.Fields(update.Message.Text)
+			switch userState[userId] {
+			case "deleting":
+				for _, w := range words {
+					idx, err := strconv.Atoi(w)
+					if err == nil && idx < len(ptf.Items) {
+						ptf.Items = append(ptf.Items[:idx], ptf.Items[idx+1:]...)
+					}
+				}
+				client.Index().Id(strconv.Itoa(userId)).Index("quotes").Type("portfolio").BodyJson(ptf).Do()
+				text = "Portfolio was updated"
 			}
 		}
 		message := tgbotapi.NewMessage(update.Message.Chat.ID, text)

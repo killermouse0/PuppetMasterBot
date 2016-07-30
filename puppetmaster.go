@@ -95,7 +95,7 @@ func main() {
 				for i, item := range ptf.Items {
 					text += fmt.Sprintf("%v - %v\n", i, item)
 				}
-				text += "\nWhich index do you want to delete ?\n"
+				text += "\nWhich indces do you want to delete ? (You can delete more than one at once)\n"
 				userState[userId] = "deleting"
 			case "/watchlist":
 				q, err := quote.Retrieve(qs, ptf.Items)

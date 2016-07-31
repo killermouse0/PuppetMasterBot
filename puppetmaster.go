@@ -119,7 +119,7 @@ func main() {
 						var data map[string]interface{}
 						stmt.Scan(&data)
 						text += fmt.Sprintf("%s\n    |%10s|%10s|\n",
-							truncToN(data["Name"].(string), 10),
+							data["Name"],
 							data["ChangeinPercent"],
 							data["LastTradePriceOnly"])
 					}

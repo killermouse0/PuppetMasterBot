@@ -114,7 +114,6 @@ func main() {
 				if err != nil {
 					log.Println("YQL query failed :", err)
 				} else {
-					log.Println("YQL query succeeded")
 					text = "<pre>"
 					for stmt.Next() {
 						var data map[string]interface{}
@@ -123,7 +122,6 @@ func main() {
 							truncToN(data["Name"].(string), 10),
 							data["ChangeinPercent"],
 							data["LastTradePriceOnly"])
-					log.Println(text)
 					}
 					text += "</pre>"
 				}

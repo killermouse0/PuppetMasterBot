@@ -114,6 +114,7 @@ func main() {
 				if err != nil {
 					log.Println("YQL query failed :", err)
 				} else {
+					log.Println("YQL query succeeded")
 					text = "<pre>"
 					for stmt.Next() {
 						var data map[string]interface{}

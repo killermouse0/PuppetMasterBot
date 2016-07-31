@@ -32,6 +32,15 @@ func (p *Portfolio) addItems(items []string) {
 	}
 }
 
+func truncToN(s string, n int) (res string) {
+	if len(s) > n {
+		res = s[:n-1]
+	} else {
+		res = s
+	}
+	return res
+}
+
 func main() {
 	const token = "TOKEN"
 	const botUrl = "BOTURL"
@@ -109,7 +118,10 @@ func main() {
 					for stmt.Next() {
 						var data map[string]interface{}
 						stmt.Scan(&data)
-						text += fmt.Sprintf("|%-10s|%10s|%10s|\n", data["Name"], data["Change"], data["LastTradePriceOnly"] )
+						text += fmt.Sprintf("|%-10s|%10s|%10s|\n",
+							truncToN(data["Name"].(string), 10),
+							data["Change"],
+							data["LastTradePriceOnly"])
 					}
 					text += "</pre>"
 				}

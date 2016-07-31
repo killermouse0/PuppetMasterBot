@@ -142,6 +142,7 @@ func main() {
 			}
 		}
 		message := tgbotapi.NewMessage(update.Message.Chat.ID, text)
+		message.ParseMode = "HTML"
 		bot.Send(message)
 	}
 }

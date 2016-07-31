@@ -109,7 +109,7 @@ func main() {
 					for stmt.Next() {
 						var data map[string]interface{}
 						stmt.Scan(&data)
-						text += fmt.Sprintf("|%-10s|%7.2f|%10.5f|\n", data["Name"], data["Change"], data["LastTradePriceOnly"] )
+						text += fmt.Sprintf("|%-10s|%10s|%10s|\n", data["Name"], data["Change"], data["LastTradePriceOnly"] )
 					}
 					text += "</pre>"
 				}

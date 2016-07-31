@@ -123,6 +123,7 @@ func main() {
 							truncToN(data["Name"].(string), 10),
 							data["ChangeInPercent"],
 							data["LastTradePriceOnly"])
+					log.Println(text)
 					}
 					text += "</pre>"
 				}

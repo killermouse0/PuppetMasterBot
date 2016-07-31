@@ -5,12 +5,15 @@ import (
 	"log"
 	"net/http"
 	"fmt"
-	"github.com/sckor/quote"
-	_ "github.com/sckor/yahoo"
 	"gopkg.in/olivere/elastic.v3"
 	"strconv"
 	"encoding/json"
 	"strings"
+
+	// "github.com/sckor/quote"
+	// _ "github.com/sckor/yahoo"
+	"database/sql"
+	_ "github.com/mattn/go-yql"
 )
 
 type Portfolio struct {
@@ -53,9 +56,14 @@ func main() {
 	go http.ListenAndServe("127.0.0.1:9080", nil)
 
 	/* Yahoo Finance API connection */
-	qs, err := quote.Open("yahoo", "")
+/*	qs, err := quote.Open("yahoo", "")
 	if err != nil {
 		log.Fatalln("Can't open Yahoo API:", err)
+	} */
+
+	db, err := sql.Open("yql", "||store://datatables.org/alltableswithkeys")
+	if err != nil {
+		log.Panic(err)
 	}
 
 	/* Elasticsearch connection */
@@ -99,13 +107,27 @@ func main() {
 				text += "\nWhich indces do you want to delete ? (You can delete more than one at once)\n"
 				userState[userId] = "deleting"
 			case "/watchlist":
-				q, err := quote.Retrieve(qs, ptf.Items)
+/*				q, err := quote.Retrieve(qs, ptf.Items)
 				if err != nil {
 					log.Fatalln("Couldn't get the prices:", err)
-				}
-				text = ""
-				for _, sq := range q {
-					text += fmt.Sprintf("%v:\t\t%v\n", sq.Symbol, sq.LastTradePrice)
+				} */
+				stocks := strings.Join(ptf.Items, `","`)
+				stocks = `"` + stocks + `"`
+				stmt, err := db.Query("select * from yahoo.finance.quote where symbol in (" + stocks + ")")
+				if err != nil {
+					log.Println("YQL query failed :", err)
+				} else {
+					text = ""
+					/* 
+					for _, sq := range q {
+						text += fmt.Sprintf("%v:\t\t%v\n", sq.Symbol, sq.LastTradePrice)
+					}
+					*/
+					for stmt.Next() {
+						var data map[string]interface{}
+						stmt.Scan(&data)
+						text += fmt.Sprintf("%v %v %v\n", data["Name"], data["Change"], data["LastTradePriceOnly"] )
+					}
 				}
 			case "/search":
 				text = "Not yet implemented!"

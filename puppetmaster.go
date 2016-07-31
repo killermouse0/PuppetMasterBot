@@ -121,7 +121,7 @@ func main() {
 						stmt.Scan(&data)
 						text += fmt.Sprintf("|%-10s|%10s|%10s|\n",
 							truncToN(data["Name"].(string), 10),
-							data["ChangeInPercent"],
+							data["ChangeinPercent"],
 							data["LastTradePriceOnly"])
 					log.Println(text)
 					}

@@ -110,7 +110,7 @@ func main() {
 			case "/watchlist":
 				stocks := strings.Join(ptf.Items, `","`)
 				stocks = `"` + stocks + `"`
-				stmt, err := db.Query("select * from yahoo.finance.quote where symbol in (" + stocks + ")")
+				stmt, err := db.Query("select * from yahoo.finance.quotes where symbol in (" + stocks + ")")
 				if err != nil {
 					log.Println("YQL query failed :", err)
 				} else {
@@ -120,7 +120,7 @@ func main() {
 						stmt.Scan(&data)
 						text += fmt.Sprintf("|%-10s|%10s|%10s|\n",
 							truncToN(data["Name"].(string), 10),
-							data["Change"],
+							data["ChangeInPercent"],
 							data["LastTradePriceOnly"])
 					}
 					text += "</pre>"

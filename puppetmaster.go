@@ -110,7 +110,9 @@ func main() {
 			case "/watchlist":
 				stocks := strings.Join(ptf.Items, `","`)
 				stocks = `"` + stocks + `"`
-				stmt, err := db.Query("select * from yahoo.finance.quotes where symbol in (" + stocks + ")")
+				query := "select * from yahoo.finance.quotes where symbol in (" + stocks + ")"
+				log.Println(query)
+				stmt, err := db.Query(query)
 				if err != nil {
 					log.Println("YQL query failed :", err)
 				} else {

@@ -1,24 +1,26 @@
 package main
 
 import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	_ "github.com/mattn/go-yql"
+	"gopkg.in/olivere/elastic.v3"
 	"log"
 	"net/http"
-	"fmt"
-	"gopkg.in/olivere/elastic.v3"
 	"strconv"
-	"encoding/json"
 	"strings"
-	"database/sql"
-	_ "github.com/mattn/go-yql"
+
+	"github.com/killermouse0/PuppetMasterBot/mybot"
 )
 
 type Portfolio struct {
-	Items	[]string `json:"items"`
+	Items []string `json:"items"`
 }
 
 func (p *Portfolio) addItems(items []string) {
-	hItems := make(map[string] int)
+	hItems := make(map[string]int)
 
 	for _, item := range p.Items {
 		hItems[item] = 1
@@ -27,7 +29,7 @@ func (p *Portfolio) addItems(items []string) {
 		hItems[item] = 1
 	}
 	p.Items = *new([]string)
-	for k, _ := range(hItems) {
+	for k, _ := range hItems {
 		p.Items = append(p.Items, k)
 	}
 }
@@ -45,7 +47,7 @@ func main() {
 	const token = "TOKEN"
 	const botUrl = "BOTURL"
 
-	userState := make(map[int]string)
+	userState := make(map[int]*mybot.UserState)
 
 	/* Bot setup */
 	bot, err := tgbotapi.NewBotAPI(token)
@@ -87,13 +89,13 @@ func main() {
 			log.Println("Couldn't find user portfolio for user=",
 				userId, ":", err)
 		}
-		var ptf Portfolio;
+		var ptf Portfolio
 		if res != nil {
 			json.Unmarshal(*res.Source, &ptf)
 		}
 
 		text := "Whatever, bro"
-		if command := getCommand(update); command != "" {
+		if command := mybot.GetCommand(update); command != "" {
 			delete(userState, userId)
 			switch command {
 			case "/add":
@@ -106,7 +108,8 @@ func main() {
 					text += fmt.Sprintf("%v - %v\n", i, item)
 				}
 				text += "\nWhich indces do you want to delete ? (You can delete more than one at once)\n"
-				userState[userId] = "deleting"
+				userState[userId] = mybot.New()
+				userState[userId].State = "deleting"
 			case "/watchlist":
 				stocks := strings.Join(ptf.Items, `","`)
 				stocks = `"` + stocks + `"`
@@ -116,6 +119,7 @@ func main() {
 				if err != nil {
 					log.Println("YQL query failed :", err)
 				} else {
+					log.Println("YQL query succeeded")
 					text = "<pre>"
 					for stmt.Next() {
 						var data map[string]interface{}
@@ -129,12 +133,19 @@ func main() {
 				}
 			case "/search":
 				text = "Not yet implemented!"
+			case "/newtracker":
+				args := strings.Fields(update.Message.Text)
+				userState[userId].State = "gettingTrackerType"
+				text = "OK, let's create that " + args[1] + " tracker!\nWhat's its type? (event, numeric, geo, duration)"
+			case "/track":
+				//				args := strings.Fields(update.Message.Text)
+				text = "Not yet implemented!"
 			default:
 				text = "Sup bro? Sorry but there's no such command!"
 			}
 		} else {
 			words := strings.Fields(update.Message.Text)
-			switch userState[userId] {
+			switch userState[userId].State {
 			case "deleting":
 				for _, w := range words {
 					idx, err := strconv.Atoi(w)
@@ -145,11 +156,11 @@ func main() {
 				}
 				var tmpItems []string
 				for _, v := range ptf.Items {
-					if (v != "") {
+					if v != "" {
 						tmpItems = append(tmpItems, v)
 					}
 				}
-				ptf.Items = tmpItems;
+				ptf.Items = tmpItems
 				client.Index().Id(strconv.Itoa(userId)).Index("quotes").Type("portfolio").BodyJson(ptf).Do()
 				text = "Portfolio was updated"
 				delete(userState, userId)
@@ -159,17 +170,4 @@ func main() {
 		message.ParseMode = "HTML"
 		bot.Send(message)
 	}
-}
-
-func getCommand(update tgbotapi.Update) (command string) {
-	command = ""
-	if update.Message.Entities != nil {
-		for _, entity := range *update.Message.Entities {
-			if entity.Type == "bot_command" {
-				command = update.Message.Text[entity.Offset:entity.Offset + entity.Length]
-				log.Println("Got command", command)
-			}
-		}
-	}
-	return command
 }
